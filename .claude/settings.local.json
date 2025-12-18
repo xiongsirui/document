@@ -5,7 +5,8 @@
       "Bash(ls:*)",
       "Bash(tree:*)",
       "Bash(pip install:*)",
-      "Bash(echo:*)"
+      "Bash(echo:*)",
+      "Bash(grep:*)"
     ]
   }
 }
