@@ -6,7 +6,10 @@
       "Bash(tree:*)",
       "Bash(pip install:*)",
       "Bash(echo:*)",
-      "Bash(grep:*)"
+      "Bash(grep:*)",
+      "Bash(python3:*)",
+      "Bash(/usr/local/lib/python3.10/site-packages/PIL/__init__.py)",
+      "Bash(sips:*)"
     ]
   }
 }
