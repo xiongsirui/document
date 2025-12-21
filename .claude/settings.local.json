@@ -9,7 +9,10 @@
       "Bash(grep:*)",
       "Bash(python3:*)",
       "Bash(/usr/local/lib/python3.10/site-packages/PIL/__init__.py)",
-      "Bash(sips:*)"
+      "Bash(sips:*)",
+      "Bash(chmod:*)",
+      "Bash(/Users/victoryx/code/document/images/claude-prompt-guide/download_images.sh:*)",
+      "Bash(curl:*)"
     ]
   }
 }
