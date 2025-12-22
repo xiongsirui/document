@@ -1,0 +1,42 @@
+Claude Code Agents实战指南配图清单
+
+1. claude-code-agents-main.jpg
+   - 位置：文章开头主图
+   - 描述：Claude Code Agents界面展示，展示AI与编程协作的场景
+   - 风格：科技感、专业
+   - 建议搜索关键词：AI coding assistant, Claude Code, programming
+
+2. claude-code-architecture.jpg
+   - 位置：原理篇-Agent架构图之前
+   - 描述：Claude Code Agents技术架构图示
+   - 风格：架构图、清晰
+   - 建议搜索关键词：AI agent architecture, software architecture diagram
+
+3. oauth-project-structure.jpg
+   - 位置：实战篇-项目初始化之后
+   - 描述：OAuth项目目录结构图
+   - 风格：文件树、代码
+   - 建议搜索关键词：project structure, file organization, code architecture
+
+4. agent-workflow.jpg
+   - 位置：进阶篇-复杂项目编排
+   - 描述：多Agent协作工作流程图
+   - 风格：流程图、团队协作
+   - 建议搜索关键词：workflow diagram, team collaboration, AI agents
+
+5. code-comparison.jpg
+   - 位置：效率对比之后
+   - 描述：传统开发vs Agent开发的对比图
+   - 风格：对比图、数据可视化
+   - 建议搜索关键词：efficiency comparison, productivity chart, before after
+
+6. claude-code-collaboration.jpg
+   - 位置：文章结尾
+   - 描述：程序员与AI协作的温馨场景
+   - 风格：人文、未来感
+   - 建议搜索关键词：human AI collaboration, future of programming, developer and AI
+
+图片要求：
+- 高清、无水印
+- 符合公众号排版风格
+- 版权合规（优先使用免费图库）
