@@ -12,7 +12,8 @@
       "Bash(sips:*)",
       "Bash(chmod:*)",
       "Bash(/Users/victoryx/code/document/images/claude-prompt-guide/download_images.sh:*)",
-      "Bash(curl:*)"
+      "Bash(curl:*)",
+      "Bash(open:*)"
     ]
   }
 }
