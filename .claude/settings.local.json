@@ -13,7 +13,11 @@
       "Bash(chmod:*)",
       "Bash(/Users/victoryx/code/document/images/claude-prompt-guide/download_images.sh:*)",
       "Bash(curl:*)",
-      "Bash(open:*)"
+      "Bash(open:*)",
+      "Bash(pip3 install:*)",
+      "Bash(swift:*)",
+      "Bash(pkill:*)",
+      "Bash(\"/Users/victoryx/code/document/公众号写作/images/sleepless-agent/download_images.sh\")"
     ]
   }
 }
