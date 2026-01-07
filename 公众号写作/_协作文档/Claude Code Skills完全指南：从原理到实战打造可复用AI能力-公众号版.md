@@ -68,19 +68,29 @@ Skills方式：
 打包知识 → Claude自动识别 → 按需加载 → 极致效率
 ```
 
-### Skills的核心：渐进式披露架构
+### Skills的核心：渐进式披露架构（Progressive Disclosure）
 
-这是Skills最重要的技术创新。
+这是Skills最重要的技术创新，也是 Anthropic 官方博客重点讲解的核心设计原则。
 
 **问题背景**：AI的上下文窗口是有限的资源。如果你把所有知识都塞进去，要么用不完，要么太贵。
 
-**渐进式披露**的设计哲学：
+**渐进式披露**的设计哲学（引用官方博客）：
 
-> 只在需要的时候，加载需要的知识。就像一个聪明的图书管理员，不会把整个图书馆搬到你的桌上。
+> "Like a well-organized manual that starts with a table of contents, then specific chapters, and finally a detailed appendix, skills let Claude load information only as needed."
+>
+> "就像一本组织良好的手册——先是目录，然后是具体章节，最后是详细附录——Skills 让 Claude 只在需要时加载信息。"
+
+这意味着：**Skill 可以包含的上下文量几乎无限**，因为不是一次性全部加载。
 
 **三层加载机制**：
 
 > 【配图2：渐进式披露架构图 - 使用 claude-skills/02-architecture.jpg】
+
+| 层级 | 内容 | 何时加载 | Token 消耗 |
+|------|------|----------|------------|
+| **第一层** | name + description | 启动时预加载到 system prompt | ~100 词/Skill |
+| **第二层** | SKILL.md 正文 | Claude 认为相关时加载 | 视内容而定 |
+| **第三层** | references/ 里的文件 | Claude 需要时按需读取 | 按需 |
 
 **实际效果**：
 
@@ -95,6 +105,16 @@ Skills方式：
 一个完整的Skill是一个文件夹：
 
 > 【配图3：Skill文件结构图 - 使用 claude-skills/03-file-structure.jpg】
+
+**标准目录结构**（来自官方文档）：
+
+```
+my-skill/
+├── SKILL.md           # 核心 prompt 和指令（必须）
+├── scripts/           # 可执行的 Python/Bash 脚本
+├── references/        # 加载到上下文的文档
+└── assets/            # 模板和二进制文件
+```
 
 **SKILL.md的结构**（最重要）：
 
@@ -123,6 +143,28 @@ with pdfplumber.open("file.pdf") as pdf:
 **API参考**：见 [REFERENCE.md](REFERENCE.md)
 **实战案例**：见 [EXAMPLES.md](EXAMPLES.md)
 ```
+
+### 官方案例：PDF Skill 的设计思路
+
+Anthropic 博客用 PDF Skill 作为详细案例，展示了渐进式披露的实际应用。
+
+**问题**：Claude 能理解 PDF 内容，但不能直接操作它们（比如填表单）。PDF Skill 赋予 Claude 这些新能力。
+
+**关键设计决策**：把表单填写的详细指令移到单独的 `forms.md` 文件：
+
+```
+pdf-skill/
+├── SKILL.md         # 核心指令（保持精简）
+├── reference.md     # 通用参考文档
+└── forms.md         # 填表专用指令（只在需要填表时才加载）
+```
+
+**为什么这样设计？**
+
+博客原话：
+> "By moving the form-filling instructions to a separate file (forms.md), the skill author is able to keep the core of the skill lean, trusting that Claude will read forms.md only when filling out a form."
+
+把填表指令单独放到 `forms.md`，核心 SKILL.md 保持精简。Claude 只有在真正需要填表时才会读取 forms.md，节省大量 token。
 
 ### Skills vs 其他方案的对比
 
@@ -578,9 +620,69 @@ Anthropic官方维护的Skills：
 
 ## 最佳实践：写好Skill的黄金法则
 
-基于我的实战经验，总结出以下原则：
+基于 Anthropic 官方博客和我的实战经验，总结出以下原则：
 
-### 1. 简洁至上
+### 0. 从评估开始（官方首要建议）
+
+**这是 Anthropic 博客的第一条建议**：
+
+> "Start with evaluation: Identify specific gaps in your agents' capabilities by running them on representative tasks and observing where they struggle or require additional context. Then build skills incrementally to address these shortcomings."
+
+**实操步骤**：
+1. 先让 Claude 跑几个代表性任务
+2. 观察它在哪里卡壳、需要额外解释
+3. 针对这些具体短板创建 Skill
+4. 增量式构建，不要一开始就想做个大而全的 Skill
+
+**❌ 错误做法**：凭感觉写一个"万能 Skill"
+**✅ 正确做法**：先跑任务 → 发现痛点 → 针对性补强
+
+### 1. description 是最重要的字段（关键！）
+
+**官方博客特别强调**：
+
+> "Include all 'when to use' information in the description - Not in the body. The body is only loaded after triggering, so 'When to Use This Skill' sections in the body are not helpful to Claude."
+
+**这是很多人的误区**：在 SKILL.md 正文里写"什么时候用这个 Skill"是没用的！
+
+因为正文只有在 Skill 被触发后才加载。Claude 决定是否触发 Skill 时，只能看到 description。
+
+**❌ 错误做法**：
+
+```yaml
+description: 处理数据文件
+```
+
+然后在正文里写：
+```markdown
+## 什么时候用这个 Skill
+当你需要处理股票数据、金融数据时...
+```
+
+**✅ 正确做法**：
+
+```yaml
+description: 处理量化交易数据，包括A股、港股价格清洗、日期转换、缺失值处理。当提到股票、金融数据、价格分析、CSV清洗时自动触发。
+```
+
+所有触发条件都写在 description 里。
+
+### 2. name 命名规范
+
+**官方推荐使用动名词形式（verb + -ing）**：
+
+> "We recommend using gerund form (verb + -ing) for Skill names, as this clearly describes the activity or capability the Skill provides."
+
+**技术要求**：只能用小写字母、数字和连字符
+
+**示例**：
+- ✅ `processing-pdfs`
+- ✅ `analyzing-stock-data`
+- ✅ `generating-reports`
+- ❌ `PDF_Processor`
+- ❌ `StockDataAnalyzer`
+
+### 3. 简洁至上
 
 **❌ 太啰嗦**：
 
@@ -604,21 +706,16 @@ with pdfplumber.open("file.pdf") as pdf:
 ```
 ```
 
-### 2. 描述要精准
+### 4. 结构化扩展
 
-**❌ 模糊描述**：
+**官方博客原话**：
 
-```yaml
-description: 处理数据文件
-```
+> "When the SKILL.md file becomes unwieldy, split its content into separate files and reference them. If certain contexts are mutually exclusive or rarely used together, keeping the paths separate will reduce the token usage."
 
-**✅ 精准描述**：
-
-```yaml
-description: 处理量化交易数据，包括A股、港股价格清洗、日期转换、缺失值处理。当提到股票、金融数据、价格分析时自动触发。
-```
-
-### 3. 渐进式组织
+**核心原则**：
+- SKILL.md 控制在 **500 行以内**
+- 内容太多就拆分到 `references/` 里的独立文件
+- 互斥或很少一起用的上下文，分开放
 
 ```
 SKILL.md (核心指南，<500行)
@@ -631,9 +728,44 @@ SKILL.md (核心指南，<500行)
     └── transform.py
 ```
 
-### 4. 测试驱动开发
+### 5. 脚本的双重身份
 
-创建Skill之前，先写测试用例：
+**官方博客特别提醒**：
+
+> "Code can serve as both executable tools and as documentation. It should be clear whether Claude should run scripts directly or read them into context as reference."
+
+脚本可以是：
+1. **可执行工具**：Claude 直接运行
+2. **参考文档**：Claude 读取学习
+
+**在 SKILL.md 里要写清楚**：
+
+```markdown
+## 脚本使用方式
+
+**可执行脚本**（直接运行）：
+- `python scripts/validate_data.py <file.csv>` - 验证数据质量
+- `python scripts/transform.py <input> <output>` - 转换格式
+
+**参考脚本**（读取学习）：
+- `scripts/patterns.py` - 常用数据处理模式示例，不直接运行
+```
+
+### 6. 从 Claude 视角思考
+
+**官方博客的最后一条建议**：
+
+> "Monitor how Claude uses your skill in real scenarios and iterate based on observations: watch for unexpected trajectories or overreliance on certain contexts. Pay special attention to the name and description of your skill."
+
+观察 Claude 如何使用你的 Skill：
+- 它总是跳过某个部分？→ 可能不需要
+- 它频繁读取某个文件？→ 考虑移到主 SKILL.md
+- 它总是理解错误？→ 修改描述，增加示例
+- 它过度依赖某些上下文？→ 考虑拆分
+
+### 7. 测试驱动开发
+
+创建 Skill 之前，先写测试用例：
 
 ```python
 # test_skill.py
@@ -645,13 +777,6 @@ def test_price_cleaning():
     assert clean_price("1,234.56") == 1234.56
     assert clean_price("1.2万") == 12000
 ```
-
-### 5. 迭代优化
-
-观察Claude如何使用你的Skill：
-- 它总是跳过某个部分？→ 可能不需要
-- 它频繁读取某个文件？→ 考虑移到主SKILL.md
-- 它总是理解错误？→ 修改描述，增加示例
 
 ---
 
@@ -799,3 +924,10 @@ Anthropic的愿景：
 ---
 
 *PS：我已经把文章中的量化数据清洗Skill上传到了GitHub，欢迎fork和改进。如果你创建了有意思的Skill，欢迎分享！*
+
+**Sources:**
+- [Equipping agents for the real world with Agent Skills](https://www.anthropic.com/engineering/equipping-agents-for-the-real-world-with-agent-skills)
+- [Skill authoring best practices - Claude Docs](https://platform.claude.com/docs/en/agents-and-tools/agent-skills/best-practices)
+- [Slash commands - Claude Code Docs](https://code.claude.com/docs/en/slash-commands)
+- [awesome-claude-skills - GitHub](https://github.com/travisvn/awesome-claude-skills)
+- [Claude Code: Best practices for agentic coding](https://www.anthropic.com/engineering/claude-code-best-practices)
