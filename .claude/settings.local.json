@@ -17,7 +17,8 @@
       "Bash(pip3 install:*)",
       "Bash(swift:*)",
       "Bash(pkill:*)",
-      "Bash(\"/Users/victoryx/code/document/公众号写作/images/sleepless-agent/download_images.sh\")"
+      "Bash(\"/Users/victoryx/code/document/公众号写作/images/sleepless-agent/download_images.sh\")",
+      "WebSearch"
     ]
   }
 }
