@@ -106,7 +106,7 @@ python polish_and_publish.py --list-accounts
 
 1. **AIWriteX 已启动**
    ```bash
-   cd /Users/victoryx/code/AIWriteX
+   cd I:/ai/AIWrite
    python main.py
    ```
 
@@ -132,7 +132,7 @@ python polish_and_publish.py --list-accounts
 
 ```bash
 # 启动 AIWriteX
-cd /Users/victoryx/code/AIWriteX
+cd I:/ai/AIWrite
 python main.py
 
 # 或者使用 Web UI

@@ -32,7 +32,7 @@ from datetime import datetime
 
 # 路径配置
 DOCUMENT_ROOT = Path(__file__).parent
-AIWRITEX_ROOT = Path("/Users/victoryx/code/AIWriteX")
+AIWRITEX_ROOT = Path("I:/ai/AIWrite")
 OUTPUT_DIR = AIWRITEX_ROOT / "output" / "article"
 TEMP_DIR = AIWRITEX_ROOT / "temp"
 
